@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "guten"
+version = "0.1.0"
+description = ""
+authors = ["Elton <eltonp3103@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+toml = "0.10.2"
+httpx = "^0.23.1"
+feedparser = "^6.0.10"
+pandas = "^1.5.2"
+pytz = "^2022.7"
+python-dateutil = "^2.8.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
