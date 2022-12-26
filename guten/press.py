@@ -41,9 +41,8 @@ class Press:
                 with open(path, 'r') as f:
                     feed = f.read()
             else:
-                response = await client.get(source.url)
-                if response.status_code != RESPONSE_OK_STATUS:
-                    raise PressException(f"Failed to fetch feed from '{source.url}'", None)
+                response = await client.get(source.url, follow_redirects=True)
+                response.raise_for_status()
                 feed = response.text
 
             # Parse feed
@@ -57,7 +56,7 @@ class Press:
             return (source, df)
         except Exception as e:
 
-            eprint(f"FAILED to fetch source '{source}'")
+            eprint(f"FAILED to fetch source '{source}'. Exception = '{e}'")
 
             raise PressException(f"Failed to fetch source '{source}'", e)
 

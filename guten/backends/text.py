@@ -35,9 +35,13 @@ class TextBackend(Backend):
 
             def process_source(item):
                 source, df = item
-                df["date"] = df["published"].apply(lambda x: date_parse(x))
-                data = df[df["date"] > previous_run_date]
-                data = data[["title", "author", "link"]]
+                if df.empty:
+                    return source, []
+                data = df
+                if "published" in df:
+                    df["date"] = df["published"].apply(lambda x: date_parse(x))
+                    data = df[df["date"] > previous_run_date]
+                data = data[["title", "link"]]
                 data = data.apply(lambda x: f"- [{x['title']}]({x['link']})", axis=1)
                 data = list(data)
                 return source, data

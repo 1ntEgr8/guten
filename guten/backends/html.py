@@ -62,7 +62,12 @@ def end_list():
     return "</ul>"
 
 def source_item(data):
-    return f"<li><a href='{data['link']}'>{data['title']}</a></li>"
+    return f"""
+        <details>
+            <summary><a href='{data['link']}'>{data['title']}</a></summary>
+            {data['summary']}
+        </details>
+    """
 
 class HTMLBackend(Backend):
     async def run(self, groups: List[FetchedSourceGroup], output_dir: Path) -> Path:
@@ -89,9 +94,13 @@ class HTMLBackend(Backend):
 
             def process_source(item):
                 source, df = item
-                df["date"] = df["published"].apply(lambda x: date_parse(x))
-                data = df[df["date"] > previous_run_date]
-                data = data[["title", "link"]]
+                if df.empty:
+                    return source, []
+                data = df
+                if "published" in df:
+                    df["date"] = df["published"].apply(lambda x: date_parse(x))
+                    data = df[df["date"] > previous_run_date]
+                data = data[["title", "link", "summary"]]
                 data = data.apply(lambda x: source_item(x), axis=1)
                 data = list(data)
                 return source, data
