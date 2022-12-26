@@ -25,13 +25,27 @@ def preamble():
 
             body {
                 font-size: 16px;
-                font-family: monospace;
+                font-family: sans-serif;
             }
 
             h1 {
                 border: 10px double black;
                 text-align: center;
                 padding: 10px;
+            }
+
+            details {
+                margin: 5px 0px;
+                padding: 5px 15px;
+                border-radius: 4px;
+            }
+
+            details:hover {
+                /* background: #ffffd0; */
+            }
+
+            a {
+                margin-left: 10px;
             }
         </style>
     </head>
@@ -115,9 +129,9 @@ class HTMLBackend(Backend):
                 f.write(h2(group.name.title()))
                 for source, data in sources:
                     f.write(h3(source.name))
-                    f.write(begin_list())
+                    # f.write(begin_list())
                     f.write("".join(data))
-                    f.write(end_list())
+                    # f.write(end_list())
 
             f.write(small(f"Generated at: {today.isoformat()}"))
 
