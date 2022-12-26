@@ -22,7 +22,7 @@ class ConfigParseException(Exception):
 def default_config_dir():
     path = Path("~/.config/guten").expanduser()
     if not path.exists():
-        path.mkdir()
+        path.mkdir(parents=True)
     return path
 
 

@@ -83,7 +83,7 @@ class Press:
         loader = Loader(self.config.settings.backends_dir)
         backend = loader.load(backend_key)()
         data = await self.fetch_source_groups()
-        output_dir = Path(backend_key)
+        output_dir = output_dir / Path(backend_key)
         if not output_dir.exists():
-            output_dir.mkdir()
+            output_dir.mkdir(parents=True)
         return await backend.run(data, output_dir)
