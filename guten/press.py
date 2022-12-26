@@ -67,6 +67,7 @@ class Press:
             for source in source_group.sources
         ]
         sources = await asyncio.gather(*tasks, return_exceptions=True)
+        sources = [source for source in sources if not isinstance(source, Exception)]
         return (source_group, sources)
 
     async def fetch_source_groups(self) -> List[FetchedSourceGroup]:
@@ -75,13 +76,13 @@ class Press:
                 self.fetch_source_group(client, source_group)
                 for source_group in self.config.source_groups
             ]
-            data = await asyncio.gather(*tasks, return_exceptions=True)
+            data = await asyncio.gather(*tasks)
         return data
 
     async def run(self, backend_key: str, output_dir: Path) -> Path:
         loader = Loader(self.config.settings.backends_dir)
-        data = await self.fetch_source_groups()
         backend = loader.load(backend_key)()
+        data = await self.fetch_source_groups()
         output_dir = Path(backend_key)
         if not output_dir.exists():
             output_dir.mkdir()

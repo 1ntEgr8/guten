@@ -33,7 +33,10 @@ class Loader:
 
     def load(self, key: str):
         with prepend_path(self.backends_dir):
-            module = importlib.import_module(f'backends.{key}')
+            try:
+                module = importlib.import_module(f"backends.{key}")
+            except:
+                module = importlib.import_module(f"guten.backends.{key}")
         if not hasattr(module, '__backend__'):
             raise LoaderException(f'Module {module} is missing a __backend__ attr')
 
