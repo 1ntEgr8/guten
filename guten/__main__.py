@@ -1,3 +1,4 @@
+import sys
 import argparse
 import toml
 import asyncio
@@ -9,7 +10,7 @@ from .press import Press
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="press - compile rss/atom feeds into a combined feed")
+    parser = argparse.ArgumentParser(description="guten - compile rss/atom feeds into a combined feed")
     parser.add_argument("--config-file", type=str, help="Path to config file", default=str(DEFAULT_CONFIG_PATH))
     parser.add_argument("--output-dir", type=str, help="Path to output directory", default=str(Path(".")))
     parser.add_argument("--backend", type=str, help="Backend to use", default="html")
