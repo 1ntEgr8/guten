@@ -8,8 +8,6 @@ from .config import Config, DEFAULT_CONFIG_PATH
 from .press import Press
 
 
-# TODO tqdm
-
 async def main():
     parser = argparse.ArgumentParser(description="press - compile rss/atom feeds into a combined feed")
     parser.add_argument("--config-file", type=str, help="Path to config file", default=str(DEFAULT_CONFIG_PATH))

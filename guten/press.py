@@ -56,6 +56,9 @@ class Press:
 
             return (source, df)
         except Exception as e:
+
+            eprint(f"FAILED to fetch source '{source}'")
+
             raise PressException(f"Failed to fetch source '{source}'", e)
 
     async def fetch_source_group(self, client: httpx.AsyncClient, source_group: SourceGroup) -> FetchedSourceGroup:
