@@ -96,6 +96,8 @@ class HTMLBackend(Backend):
             temp = date_parse(data)
             if temp.date() != today.date():
                 previous_run_date = temp
+            else:
+                previous_run_date = today - timedelta(days=1)
 
         with open(output_file, "w") as f:
             f.write(begin_document())
