@@ -1,5 +1,6 @@
 import asyncio
 import httpx
+import time
 import feedparser
 import pandas as pd
 
@@ -14,7 +15,8 @@ from urllib.parse import urlparse
 from pathlib import Path
 
 
-RESPONSE_OK_STATUS = 200
+NUM_RETRIES = 2
+
 
 class PressException(Exception):
     def __init__(self, message, exc):
@@ -41,8 +43,18 @@ class Press:
                 with open(path, 'r') as f:
                     feed = f.read()
             else:
-                response = await client.get(source.url, follow_redirects=True)
-                response.raise_for_status()
+                num_attempts = 0
+                while (num_attempts - 1) < NUM_RETRIES:
+                    try:
+                        num_attempts += 1
+                        response = await client.get(source.url, follow_redirects=True)
+                        response.raise_for_status()
+                        break
+                    except Exception as e:
+                        eprint(f"FAILED [attempt {num_attempts}] to fetch source '{source}'. Exception = '{e}'")
+                        time.sleep(0.5 * num_attempts)
+                if (num_attempts - 1) == NUM_RETRIES:
+                    response.raise_for_status()
                 feed = response.text
 
             # Parse feed
@@ -55,9 +67,6 @@ class Press:
 
             return (source, df)
         except Exception as e:
-
-            eprint(f"FAILED to fetch source '{source}'. Exception = '{e}'")
-
             raise PressException(f"Failed to fetch source '{source}'", e)
 
     async def fetch_source_group(self, client: httpx.AsyncClient, source_group: SourceGroup) -> FetchedSourceGroup:

@@ -32,7 +32,7 @@ class TextBackend(Backend):
 
         with open(output_file, "w") as f:
             localdate = datetime.now()
-            f.write(underline(f"Feed - {locadate.year}/{localdate.month}/{localdate.day}", c="="))
+            f.write(underline(f"Feed - {localdate.year}/{localdate.month}/{localdate.day}", c="="))
             f.write(f"Generated at: {today.isoformat()}\n\n")
 
             def process_source(item):
