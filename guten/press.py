@@ -63,6 +63,10 @@ class Press:
             # Convert to data frame
             df = pd.DataFrame(data["entries"])
 
+            if "published" not in df:
+                if "updated" in data["feed"]:
+                    df["published"] = data["feed"]["updated"]
+
             eprint(f"Fetched '{source}'")
 
             return (source, df)
