@@ -119,6 +119,8 @@ class HTMLBackend(Backend):
         # date. This approximates a fresh re-run of guten for that day.
         if hist0.date() == today.date():
             previous_run_date = hist1
+        else:
+            previous_run_date = hist0
 
         eprint(f"Showing entries published after {previous_run_date}")
 
