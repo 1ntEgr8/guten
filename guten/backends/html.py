@@ -5,6 +5,7 @@ from dateutil.parser import parse as date_parse
 
 from guten.backend import Backend
 from guten.press import FetchedSourceGroup
+from guten.utils import eprint
 
 
 METADATA_FILE = ".metadata"
@@ -83,21 +84,43 @@ def source_item(data):
         </details>
     """
 
+def DEFAULT_HIST(today):
+    return today - timedelta(days=5)
+
+
+def parse_metadata(data, today):
+    dates = [date_parse(d.strip()) for d in data.split(";")]
+
+    if len(dates) == 0:
+        return DEFAULT_HIST(today), DEFAULT_HIST(today)
+    elif len(dates) == 1:
+        return dates[0], DEFAULT_HIST(today)
+    else:
+        return dates[0], dates[1]
+    
+
 class HTMLBackend(Backend):
     async def run(self, groups: List[FetchedSourceGroup], output_dir: Path) -> Path:
         today = datetime.now(timezone.utc)
         output_file = output_dir / f"{today.year}-{today.month}-{today.day}.html"
         metadata_file = output_dir / METADATA_FILE
 
-        previous_run_date = today - timedelta(days=5)
+        hist0, hist1 = None, None
         if metadata_file.exists():
             with open(metadata_file, "r") as f:
                 data = f.read()
-            temp = date_parse(data)
-            if temp.date() != today.date():
-                previous_run_date = temp
-            else:
-                previous_run_date = today - timedelta(days=1)
+                hist0, hist1 = parse_metadata(data, today)
+        else:
+            hist0, hist1 = DEFAULT_HIST(today), DEFAULT_HIST(today)
+
+        # Now, hist0 and hist1 have been set
+
+        # If guten is run more than once, we use hist1 as the previous run
+        # date. This approximates a fresh re-run of guten for that day.
+        if hist0.date() == today.date():
+            previous_run_date = hist1
+
+        eprint(f"Showing entries published after {previous_run_date}")
 
         with open(output_file, "w") as f:
             f.write(begin_document())
@@ -141,7 +164,18 @@ class HTMLBackend(Backend):
             f.write(end_document())
 
         with open(metadata_file, "w") as f:
-            f.write(today.isoformat())
+            # If hist0.date() == today.date(), set metadate file to:
+            # <hist0>;<hist1>
+            # Otherwise, set metadata file to:
+            # <today>;<hist0>
+            if hist0.date() == today.date():
+                f.write(hist0.isoformat())
+                f.write(";")
+                f.write(hist1.isoformat())
+            else:
+                f.write(today.isoformat())
+                f.write(";")
+                f.write(hist0.isoformat())
 
         return output_file
 
